@@ -117,16 +117,10 @@ def create_test_dataframe():
     for game in games_so_far:
         visitor_stats = {'pts': game['visitor_points'], 'home': 0, 'OT': game['OT'], 'ortg': team_stats[game['visitor']]['ortg'],
                          'opp_drtg': team_stats[game['home']]['drtg'], 'pace': team_stats[game['visitor']]['pace'],
-                         'opp_pace': team_stats[game['home']]['pace'], 'ts_pct': team_stats[game['visitor']]['ts_pct'],
-                         'avg_ast': team_stats[game['visitor']]['ast'], 'avg_trb': team_stats[game['visitor']]['trb'],
-                         'avg_opp_stl': team_stats[game['home']]['stl'], 'avg_opp_blk': team_stats[game['home']]['blk'],
-                         'avg_pts': team_stats[game['visitor']]['pts']}
+                         'opp_pace': team_stats[game['home']]['pace'], 'avg_pts': team_stats[game['visitor']]['pts']}
         home_stats = {'pts': game['home_points'], 'home': 1, 'OT': game['OT'], 'ortg': team_stats[game['home']]['ortg'],
                       'opp_drtg': team_stats[game['visitor']]['drtg'], 'pace': team_stats[game['home']]['pace'],
-                      'opp_pace': team_stats[game['visitor']]['pace'], 'ts_pct': team_stats[game['home']]['ts_pct'],
-                      'avg_ast': team_stats[game['home']]['ast'], 'avg_trb': team_stats[game['home']]['trb'],
-                      'avg_opp_stl': team_stats[game['visitor']]['stl'], 'avg_opp_blk': team_stats[game['visitor']]['blk'],
-                      'avg_pts': team_stats[game['home']]['pts']}
+                      'opp_pace': team_stats[game['visitor']]['pace'], 'avg_pts': team_stats[game['home']]['pts']}
         team_results.append(visitor_stats)
         team_results.append(home_stats)
 
