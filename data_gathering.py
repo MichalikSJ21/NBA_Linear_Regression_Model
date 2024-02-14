@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import date, datetime
 import calendar
+import pandas as pd
 
 
 MONTHS = ['october', 'november', 'december', 'january', 'february', 'march', 'april']
@@ -94,12 +95,39 @@ def _extract_soup(url):
     return soup
 
 
-def main():
-    all_game_results = get_nba_season_results()
-    nba_abbreviations = get_nba_abbreviations()
-    for game in get_games_today():
-        print(game)
+def get_team_stats():
+    teams = {}
+
+    for team in get_basic_stats():
+        teams[team['team']] = {'fg_pct': team['fg_pct'], 'fg3a': team['fg3a'], 'trb': team['trb'], 'ast': team['ast'],
+                               'pts': team['pts'], 'stl': team['stl'], 'blk': team['blk']}
+
+    for team in get_advanced_stats():
+        stats = {'ortg': team['off_rtg'], 'drtg': team['def_rtg'], 'pace': team['pace'], 'ts_pct': team['ts_pct']}
+        teams[team['team']].update(stats)
+
+    return teams
 
 
-if __name__ == '__main__':
-    main()
+def create_test_dataframe():
+    team_results = []
+    games_so_far = get_nba_season_results()
+    team_stats = get_team_stats()
+
+    for game in games_so_far:
+        visitor_stats = {'pts': game['visitor_points'], 'home': 0, 'OT': game['OT'], 'ortg': team_stats[game['visitor']]['ortg'],
+                         'opp_drtg': team_stats[game['home']]['drtg'], 'pace': team_stats[game['visitor']]['pace'],
+                         'opp_pace': team_stats[game['home']]['pace'], 'ts_pct': team_stats[game['visitor']]['ts_pct'],
+                         'avg_ast': team_stats[game['visitor']]['ast'], 'avg_trb': team_stats[game['visitor']]['trb'],
+                         'avg_opp_stl': team_stats[game['home']]['stl'], 'avg_opp_blk': team_stats[game['home']]['blk'],
+                         'avg_pts': team_stats[game['visitor']]['pts']}
+        home_stats = {'pts': game['home_points'], 'home': 1, 'OT': game['OT'], 'ortg': team_stats[game['home']]['ortg'],
+                      'opp_drtg': team_stats[game['visitor']]['drtg'], 'pace': team_stats[game['home']]['pace'],
+                      'opp_pace': team_stats[game['visitor']]['pace'], 'ts_pct': team_stats[game['home']]['ts_pct'],
+                      'avg_ast': team_stats[game['home']]['ast'], 'avg_trb': team_stats[game['home']]['trb'],
+                      'avg_opp_stl': team_stats[game['visitor']]['stl'], 'avg_opp_blk': team_stats[game['visitor']]['blk'],
+                      'avg_pts': team_stats[game['home']]['pts']}
+        team_results.append(visitor_stats)
+        team_results.append(home_stats)
+
+    return pd.DataFrame.from_dict(team_results)
