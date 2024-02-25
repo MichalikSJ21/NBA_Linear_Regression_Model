@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import calendar
 import pandas as pd
 
@@ -8,9 +8,10 @@ import pandas as pd
 MONTHS = ['october', 'november', 'december', 'january', 'february', 'march', 'april']
 TODAY = date.today()
 ABBREVIATIONS_FILE = 'nba_teams.text'
+DAYS_TO_INCLUDE = 150
 
 
-def get_nba_season_results() -> list[dict]:
+def get_nba_season_results(days: int) -> list[dict]:
     games = []
     for month in MONTHS:
         url = f'https://www.basketball-reference.com/leagues/NBA_2024_games-{month}.html'
@@ -27,7 +28,7 @@ def get_nba_season_results() -> list[dict]:
                 if td['data-stat'] == 'overtimes' and td.text == 'OT': game['OT'] = 1
                 if td['data-stat'] == 'date_game':
                     game_date = datetime.strptime(td.text, '%a, %b %d, %Y').date()
-                    if game_date < TODAY:
+                    if TODAY > game_date > TODAY - timedelta(days=days):
                         game['date'] = game_date
                         games.append(game)
     return games
@@ -111,7 +112,7 @@ def get_team_stats():
 
 def create_test_dataframe():
     team_results = []
-    games_so_far = get_nba_season_results()
+    games_so_far = get_nba_season_results(DAYS_TO_INCLUDE)
     team_stats = get_team_stats()
 
     for game in games_so_far:

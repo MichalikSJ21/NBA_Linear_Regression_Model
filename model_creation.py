@@ -3,7 +3,8 @@ import statsmodels.api as sm
 
 
 def main():
-    ordinary_least_squares_model()
+    res = ordinary_least_squares_model()
+    print(res.summary())
 
 
 def ordinary_least_squares_model():
