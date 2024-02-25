@@ -8,7 +8,6 @@ import pandas as pd
 MONTHS = ['october', 'november', 'december', 'january', 'february', 'march', 'april']
 TODAY = date.today()
 ABBREVIATIONS_FILE = 'nba_teams.text'
-DAYS_TO_INCLUDE = 150
 
 
 def get_nba_season_results(days: int) -> list[dict]:
@@ -104,24 +103,41 @@ def get_team_stats():
                                'pts': team['pts'], 'stl': team['stl'], 'blk': team['blk']}
 
     for team in get_advanced_stats():
-        stats = {'ortg': team['off_rtg'], 'drtg': team['def_rtg'], 'pace': team['pace'], 'ts_pct': team['ts_pct']}
+        stats = {'ortg': team['off_rtg'], 'drtg': team['def_rtg'], 'pace': team['pace'], 'ts_pct': team['ts_pct'],
+                 'efg_pct': team['efg_pct'], 'tov_pct': team['tov_pct'],
+                 'orb_pct': team['orb_pct'], 'ft_rate': team['ft_rate']}
         teams[team['team']].update(stats)
 
     return teams
 
 
-def create_test_dataframe():
+def create_dataframe(games, train: bool, team_stats):
     team_results = []
-    games_so_far = get_nba_season_results(DAYS_TO_INCLUDE)
-    team_stats = get_team_stats()
 
-    for game in games_so_far:
-        visitor_stats = {'pts': game['visitor_points'], 'home': 0, 'OT': game['OT'], 'ortg': team_stats[game['visitor']]['ortg'],
-                         'opp_drtg': team_stats[game['home']]['drtg'], 'pace': team_stats[game['visitor']]['pace'],
-                         'opp_pace': team_stats[game['home']]['pace'], 'avg_pts': team_stats[game['visitor']]['pts']}
-        home_stats = {'pts': game['home_points'], 'home': 1, 'OT': game['OT'], 'ortg': team_stats[game['home']]['ortg'],
-                      'opp_drtg': team_stats[game['visitor']]['drtg'], 'pace': team_stats[game['home']]['pace'],
-                      'opp_pace': team_stats[game['visitor']]['pace'], 'avg_pts': team_stats[game['home']]['pts']}
+    if train:
+        for game in games:
+            visitor_stats = {'pts': game['visitor_points'], 'home': 0, 'OT': game['OT'],
+                             'ortg': team_stats[game['visitor']]['ortg'],
+                             'opp_drtg': team_stats[game['home']]['drtg'], 'pace': team_stats[game['visitor']]['pace'],
+                             'opp_pace': team_stats[game['home']]['pace'],
+                             'avg_pts': team_stats[game['visitor']]['pts'],
+                             }
+            home_stats = {'pts': game['home_points'], 'home': 1, 'OT': game['OT'],
+                          'ortg': team_stats[game['home']]['ortg'],
+                          'opp_drtg': team_stats[game['visitor']]['drtg'], 'pace': team_stats[game['home']]['pace'],
+                          'opp_pace': team_stats[game['visitor']]['pace'], 'avg_pts': team_stats[game['home']]['pts'],
+                          }
+            team_results.append(visitor_stats)
+            team_results.append(home_stats)
+    else:
+        visitor_stats = {'home': 0, 'OT': 0, 'ortg': team_stats[games['visitor']]['ortg'],
+                         'opp_drtg': team_stats[games['home']]['drtg'], 'pace': team_stats[games['visitor']]['pace'],
+                         'opp_pace': team_stats[games['home']]['pace'],'avg_pts': team_stats[games['visitor']]['pts'],
+                         }
+        home_stats = {'home': 1, 'OT': 0, 'ortg': team_stats[games['home']]['ortg'],
+                      'opp_drtg': team_stats[games['visitor']]['drtg'], 'pace': team_stats[games['home']]['pace'],
+                      'opp_pace': team_stats[games['visitor']]['pace'], 'avg_pts': team_stats[games['home']]['pts'],
+                      }
         team_results.append(visitor_stats)
         team_results.append(home_stats)
 
