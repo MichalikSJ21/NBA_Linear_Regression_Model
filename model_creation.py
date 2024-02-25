@@ -35,6 +35,7 @@ def predict_game_scores(model):
         print(f'{game["visitor"]}: {round(ypred[0], 2)}, {game["home"]} {round(ypred[1], 2)}')
         spread = ypred[0] - ypred[1]
         print(f'Spread: {game["home"]} {"+" if spread > 0 else ""}{round_off_rating(spread)}')
+        print(f'Total Score: {round_off_rating(sum(ypred))}')
         print()
 
     print(f'Check Live Betting Lines: {"https://www.actionnetwork.com/nba/odds"}')
