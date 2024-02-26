@@ -7,7 +7,7 @@ TEAM_STATS = get_team_stats()
 
 def main():
     res = ordinary_least_squares_model()
-    print(f'Adjusted R-Squared Value: {res.rsquared_adj}\n')
+    print(f'Adjusted R-Squared Value: {round(res.rsquared_adj, 2)}\n')
     predict_game_scores(res)
 
 
@@ -39,6 +39,7 @@ def predict_game_scores(model):
         print()
 
     print(f'Check Live Betting Lines: {"https://www.actionnetwork.com/nba/odds"}')
+    print(f'Check NBA Injury Logs: {"https://www.espn.com/nba/injuries"}')
 
 
 if __name__ == '__main__':
